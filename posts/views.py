@@ -1,0 +1,62 @@
+from django.shortcuts import render
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status, permissions
+from .models import Post,Tag
+from .serializers import PostSerializer,TagSerializer
+from rest_framework.permissions import IsAuthenticated
+from django.shortcuts import render, get_object_or_404
+from django.http import Http404
+class PostCreateAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        posts = Post.objects.filter(user=request.user)
+        serializer = PostSerializer(posts, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = PostSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class PostUpdateAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self, id, user):
+        return get_object_or_404(Post, id=id, user=user)
+
+    def get(self, request, id):
+        post = self.get_object(id, request.user)
+        serializer = PostSerializer(post)
+        return Response(serializer.data)
+
+    def put(self, request, id):
+        post = self.get_object(id, request.user)
+        serializer = PostSerializer(post, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class PostDeleteAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self, id, user):
+        return get_object_or_404(Post, id=id, user=user)
+    def delete(self, request, id):
+        post = self.get_object(id, request.user)
+        post.delete()
+        return Response({'message':"deleted succesfully"},status=status.HTTP_204_NO_CONTENT)
+
+
+
+class AddTagToPostView(APIView):
+    def post(self, request, pk):
+        post = get_object_or_404(Post, pk=pk)
+        tag_data = request.data
+        tag, created = Tag.objects.get_or_create(name=tag_data['name'])
+        post.tags.add(tag)
+        return Response({'status': 'tag added'}, status=status.HTTP_200_OK)
