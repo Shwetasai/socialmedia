@@ -2,8 +2,9 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import FollowerSerializer 
+from .serializers import FollowerSerializer ,FollowersListSerializer,FollowingListSerializer
 from .models import Followers,CustomUser
+from django.shortcuts import get_object_or_404
 
 
 class CustomFollowUserView(APIView):
@@ -35,6 +36,20 @@ class CustomFollowUserView(APIView):
         else:
             return Response({"error":"Please provide valid data"}, status=status.HTTP_400_BAD_REQUEST)
       
+class FollowersListView(APIView):
+    permission_classes = [IsAuthenticated]
 
+    def get(self, request, id):
+        user = get_object_or_404(CustomUser, id=id)
+        serializer = FollowersListSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class FollowingListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, id):
+        user = get_object_or_404(CustomUser, id=id)
+        serializer = FollowingListSerializer(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 

@@ -28,6 +28,8 @@ INSTALLED_APPS = [
     'comments',
 ]
 
+SILENCED_SYSTEM_CHECKS = ['fields.E301']
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

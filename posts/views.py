@@ -11,10 +11,6 @@ from .models import Post, Tag
 class PostCreateAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        posts = Post.objects.filter(user=request.user)
-        serializer = PostSerializer(posts, many=True)
-        return Response(serializer.data)
 
     def post(self, request):
         serializer = PostSerializer(data=request.data)
@@ -23,11 +19,31 @@ class PostCreateAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    
 
-class PostUpdateAPIView(APIView):
+class PostmanageAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get_object(self, id, user):
+    def get(self, request, id):
+        post = get_object_or_404(Post, id=id, user=request.user)
+        serializer = PostSerializer(post)
+        return Response(serializer.data)
+
+    def put(self, request, id):
+        post = get_object_or_404(Post, id=id, user=request.user)
+        serializer = PostSerializer(post, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, id):
+        post = get_object_or_404(Post, id=id, user=request.user)
+        post.tags.clear()   
+        post.delete()
+        return Response({'message': "deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+
+    '''def get_object(self, id, user):
         return get_object_or_404(Post, id=id, user=user)
 
     def get(self, request, id):
@@ -52,7 +68,7 @@ class PostDeleteAPIView(APIView):
     def delete(self, request, id):
         post = self.get_object(id, request.user)
         post.delete()
-        return Response({'message':"deleted succesfully"},status=status.HTTP_204_NO_CONTENT)
+        return Response({'message':"deleted succesfully"},status=status.HTTP_204_NO_CONTENT)'''
 
 
 class AddTagToPostView(APIView):

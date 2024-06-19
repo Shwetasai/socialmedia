@@ -15,4 +15,7 @@ media/*
 !media/post_images/
 media/
 
-
+media/*
+**/migrations/
+*/migrations/*
+!*/migrations/__init__.py
