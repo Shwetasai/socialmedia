@@ -3,33 +3,24 @@ from .models import CustomUser
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
 import logging
-from rest_framework_simplejwt.tokens import RefreshToken
 
 logger = logging.getLogger(__name__)
 
-class CustomUserSerializer(serializers.ModelSerializer):#convert models.py data into JSON
-    class Meta:
-        model = CustomUser#convert data into JSON from database
-        fields = ['id', 'username', 'email', 'password']
-        extra_kwargs = {'password': {'write_only': True}}#additional data
 
-    def create(self, validated_data):#for create a new user
+class CustomUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['id', 'username', 'email', 'password']
+        extra_kwargs = {'password': {'write_only': True}}
+
+    def create(self, validated_data):
             password = validated_data.pop('password')
             user = CustomUser(**validated_data)
             user.set_password(password)
             user.save()
             return user
 
-    '''def create(self, validated_data):
-        user = CustomUser.objects.create_user(
-             username=validated_data['username'],
-             email=validated_data['email'],
-             password=validated_data['password'],
-             first_name=validated_data.get('first_name', ''),
-             last_name=validated_data.get('last_name', '')
-        )    
-       
-        return user'''
+
 class TokenObtainPairSerializer(serializers.Serializer):
     email=serializers.EmailField()
     password=serializers.CharField(write_only=True)
@@ -55,15 +46,12 @@ class TokenObtainPairSerializer(serializers.Serializer):
 class UserLoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
-    print("shweta")
+    
     def validate(self, attrs):
         email = attrs.get('email')
         password = attrs.get('password')
-        print("password",password,email)
-        #from rest_framework_simplejwt.tokens import RefreshToken
         if email and password:
             user = authenticate(request=self.context.get('request'), email=email, password=password)
-            print("5444444",user)
             refresh = RefreshToken.for_user(user)
             if user is None:
                 raise serializers.ValidationError('Invalid credentials', code='authorization')

@@ -1,17 +1,22 @@
 from rest_framework import serializers
 from .models import Post, Tag
 
+
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
         fields = ['id', 'name']
 
+
 class PostSerializer(serializers.ModelSerializer):
-    tags = TagSerializer(many=True)
+
+    #tags = TagSerializer(many=True)
+    
     class Meta:
         model = Post
-        fields = ['id', 'user', 'text_content','tags','image', 'created_at', 'updated_at']
+        fields = ['id', 'user', 'text_content', 'image', 'created_at', 'updated_at']
         read_only_fields = ['user', 'created_at', 'updated_at']
+
 
     def create(self, validated_data):
         tags_data = validated_data.pop('tags',[])
@@ -23,7 +28,6 @@ class PostSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         tags_data = validated_data.pop('tags',[])
-        instance.title = validated_data.get('title', instance.title)
         instance.text_content = validated_data.get('text_content', instance.text_content)
         instance.image = validated_data.get('image', instance.image)
         instance.save()

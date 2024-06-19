@@ -1,6 +1,7 @@
 from django.db import models
 from Users.models import CustomUser
 
+
 class Followers(models.Model):
     follower = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='following')
     following = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='followers')

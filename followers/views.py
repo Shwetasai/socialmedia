@@ -5,6 +5,7 @@ from rest_framework import status
 from .serializers import FollowerSerializer 
 from .models import Followers,CustomUser
 
+
 class CustomFollowUserView(APIView):
     permission_classes =[IsAuthenticated]
 
@@ -19,15 +20,12 @@ class CustomFollowUserView(APIView):
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
         if request_type == 'follow':
-            # Check if already following
             if Followers.objects.filter(follower=follower, following=following).exists():
                 return Response({'error': 'Already following'}, status=status.HTTP_400_BAD_REQUEST)
-            # Create follow relationship
             Followers.objects.create(follower=follower, following=following)
             return Response({'message': 'Followed successfully'}, status=status.HTTP_201_CREATED)
 
         elif request_type == 'unfollow':
-            # Check if already following
             follow_instance = Followers.objects.filter(follower=follower, following=following).first()
             if follow_instance:
                 follow_instance.delete()

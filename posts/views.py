@@ -1,12 +1,13 @@
-from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, permissions
-from .models import Post,Tag
 from .serializers import PostSerializer,TagSerializer
 from rest_framework.permissions import IsAuthenticated
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import get_object_or_404
 from django.http import Http404
+from .models import Post, Tag 
+
+
 class PostCreateAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -21,6 +22,7 @@ class PostCreateAPIView(APIView):
             serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class PostUpdateAPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -41,6 +43,7 @@ class PostUpdateAPIView(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class PostDeleteAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -52,10 +55,15 @@ class PostDeleteAPIView(APIView):
         return Response({'message':"deleted succesfully"},status=status.HTTP_204_NO_CONTENT)
 
 
-
 class AddTagToPostView(APIView):
-    def post(self, request, pk):
-        post = get_object_or_404(Post, pk=pk)
+
+    def get(self, request, id):
+        post = get_object_or_404(Post, id=id)
+        tags = TagSerializer(post.tags.all(), many=True).data
+        return Response({'tags': tags}, status=status.HTTP_200_OK)
+
+    def post(self, request, id):
+        post = get_object_or_404(Post, id=id)
         tag_data = request.data
         tag, created = Tag.objects.get_or_create(name=tag_data['name'])
         post.tags.add(tag)

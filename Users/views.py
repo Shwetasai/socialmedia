@@ -5,31 +5,31 @@ from django.contrib.auth.models import User
 from .models import CustomUser
 from .serializers import CustomUserSerializer,UserLoginSerializer,TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from django.contrib.auth import authenticate
+from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
+
 
 class CustomUserCreateView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs): 
-        email = request.data.get('email')# requested data
+        email = request.data.get('email')
         username = request.data.get('username')
         password = request.data.get('password')
 
-        if not email or not username or not password:#related conditions
+        if not email or not username or not password:
             return Response({'error':'all fields are require.'},status=status.HTTP_400_BAD_REQUEST)
         if CustomUser.objects.filter(username=username).exists():
             return Response({'error':'username already exists.'},status=status.HTTP_400_BAD_REQUEST)
         if CustomUser.objects.filter(email=email).exists():
             return Response({'error':'email already exists.'},status=status.HTTP_400_BAD_REQUEST)
 
-        serializer=CustomUserSerializer(data=request.data)#convert requested data
-        if serializer.is_valid():# if data has converted
-            serializer.save()#save data
+        serializer=CustomUserSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)#if data has issue
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
 class CustomTokenObtainPairView(APIView):
@@ -46,7 +46,6 @@ class UserLoginView(APIView):
     permission_classes = [AllowAny]
         
     def post(self, request):
-        print("request data",request.data)
         serializer = UserLoginSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.validated_data['user']
@@ -56,6 +55,5 @@ class UserLoginView(APIView):
                 'access': str(refresh.access_token),
             })
         else:
-            print("serializer errors",serializer.errors)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

@@ -4,6 +4,6 @@ from .views import PostCreateAPIView,PostUpdateAPIView,PostDeleteAPIView,AddTagT
 urlpatterns = [
     path('create/', PostCreateAPIView.as_view(), name='post_create'),
     path('update/<int:id>/', PostUpdateAPIView.as_view(), name='post_update'),
-    path('<int:id>/delete/', PostDeleteAPIView.as_view(), name='post_delete'),
-    path('<int:pk>/add_tag/', AddTagToPostView.as_view(), name='add-tag-to-post'),
+    path('delete/<int:id>/', PostDeleteAPIView.as_view(), name='post_delete'),
+    path('add_tag/<int:id>/', AddTagToPostView.as_view(), name='add-tag-to-post'),
 ]
