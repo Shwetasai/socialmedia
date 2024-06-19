@@ -11,3 +11,11 @@ env
 # Ignore media files
 media/*
 !media/post_images/
+
+*/migrations/
+media/*
+
+*/migrations/*.py
+*/migrations/*.pyc
+*/migrations/__pycache__/*
+ __pycache__
