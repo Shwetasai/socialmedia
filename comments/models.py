@@ -11,6 +11,7 @@ class Comment(models.Model):
         return f'Comment on {self.post.id}'
 
 
+
 class Reply(models.Model):
     comment = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name='replies')
     text = models.TextField()
