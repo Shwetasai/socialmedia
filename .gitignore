@@ -1,4 +1,4 @@
-# Ignore Python bytecode files
+
 __pycache__/
 *.pyc
 
@@ -19,3 +19,7 @@ media/*
 **/migrations/
 */migrations/*
 !*/migrations/__init__.py
+# Ignore Django migration files
+*/migrations/*
+# Ignore media files
+media/
